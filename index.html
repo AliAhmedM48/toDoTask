@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3 | jQuery</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="jquery-3.7.1.js"></script>
+    <style>
+        * {
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+        <div class="row">
+            <div class="col-5 col-md-6 mx-auto  d-flex justify-content-center flex-column mt-5">
+                <section class="d-flex gap-3 mb-3">
+                    <input class="form-control fs-4 px-4 py-2" type="text" placeholder="New Task..." name="todo-input"
+                        id="taskInput">
+                    <button class="btn btn-secondary fs-4 px-4" id="addButton">Add</button>
+                </section>
+                <section id="tasksArea">
+
+
+                </section>
+            </div>
+        </div>
+    </main>
+    <script>
+
+        $(document).ready(function () {
+            // Variables
+            var tasksList = [];
+
+            // Functions
+            function displayTaskElement(tasksListArray) {
+                for (var i = 0; i < tasksListArray.length; i++) {
+                    var element = createTaskElement(tasksListArray[i]);
+                    $('#tasksArea').prepend(element);
+                }
+            }
+
+            function createTaskElement(taskText) {
+                return `
+             <div id="taskParentDiv" class="bg-body-secondary my-2 d-flex align-content-center fs-4 rounded  px-4 py-2">
+                        <input class="checkBoxTask form-check-input" type="checkbox" name="" id="task">
+                        <label class="taskText flex-grow-1 px-3 align-self-center">${taskText}</label>
+                        <button class="removeButton btn fs-5 btn-close d-none"></button>
+                    </div>
+            `;
+            }
+
+            // Initialization | get data from local storage & display it.
+            if (localStorage.getItem('tasks') !== null) {
+                tasksList = JSON.parse(localStorage.getItem('tasks'));
+                displayTaskElement(tasksList);
+            };
+
+            // Events
+            $('#addButton').click(function () {
+                var taskText = $('#taskInput').val();
+                var element = createTaskElement(taskText);
+                $('#tasksArea').prepend(element);
+
+                // When adding a task, push an object to the tasksList
+                tasksList.push(taskText);
+
+                localStorage.setItem('tasks', JSON.stringify(tasksList));
+                console.log(tasksList);
+                $('#taskInput').val('');
+            });
+            console.log(tasksList);
+
+            // add click event to remove buttons
+            $('#tasksArea').on('click', '.removeButton', function () {
+                $(this).parent().remove();
+
+                var taskText = $(this).parent().find('label').text();
+                var taskIndex = tasksList.indexOf(taskText);
+                tasksList.splice(taskIndex, 1);
+                console.log(tasksList);
+                localStorage.setItem('tasks', JSON.stringify(tasksList));
+            });
+
+            // display remove button when task checked.
+            $('#tasksArea').on('click', '.checkBoxTask', function () {
+                var removeButton = $(this).parent().find('.removeButton');
+                // if the checkbox is checked, it becomes false, and if it's not checked, it becomes true.
+                // adds the class d-none if the expression is true and removes it if the expression is false.
+                removeButton.toggleClass('d-none', !$(this).prop('checked'));
+            });
+        })
+    </script>
+</body>
+
+</html>
